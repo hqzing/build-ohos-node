@@ -1,0 +1,31 @@
+name: CI
+
+on:
+  release:
+    types: [created]
+  push:
+    branches: [ "main" ]
+
+env:
+  VERSION: v24.2.0
+
+permissions: write-all
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+      - name: build
+        run: ./build.sh
+      - name: upload
+        if: github.event_name == 'release' && github.event.action == 'created'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }} 
+          asset_path: "./node-${{ env.VERSION }}/node-${{ env.VERSION }}-openharmony-arm64.tar.gz"
+          asset_name: "node-${{ env.VERSION }}-openharmony-arm64.tar.gz"
+          asset_content_type: application/octet-stream

@@ -1,6 +1,6 @@
 #!/bin/sh
 
-version="v24.2.0"
+version="v24.3.0"
 nodejs_source_code_url="https://nodejs.org/dist/${version}/node-${version}.tar.gz"
 
 query_component() {

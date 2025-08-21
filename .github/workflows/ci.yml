@@ -7,7 +7,7 @@ on:
     branches: [ "main" ]
 
 env:
-  VERSION: v24.2.0
+  VERSION: v24.3.0
 
 permissions: write-all
 

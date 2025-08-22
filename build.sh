@@ -1,7 +1,14 @@
 #!/bin/sh
+set -e
 
-version="v24.4.0"
-nodejs_source_code_url="https://nodejs.org/dist/${version}/node-${version}.tar.gz"
+if [ -z "$1" ]; then
+    echo "usage: ./build.sh <branch name or tag name>"
+    echo "example: ./build.sh main"
+    echo "example: ./build.sh v24.2.0"
+    exit 1
+fi
+
+version=$1
 
 query_component() {
   component=$1
@@ -10,9 +17,6 @@ query_component() {
     -H 'Content-Type: application/json' \
     --data-raw '{"projectName":"openharmony","branch":"master","pageNum":1,"pageSize":10,"deviceLevel":"","component":"'${component}'","type":1,"startTime":"2025080100000000","endTime":"20990101235959","sortType":"","sortField":"","hardwareBoard":"","buildStatus":"success","buildFailReason":"","withDomain":1}'
 }
-
-# download Node.js source code
-curl $nodejs_source_code_url -o node-${version}.tar.gz
 
 # setup openharmony sdk
 sdk_download_url=$(query_component "ohos-sdk-public" | jq -r ".data.list.dataList[0].obsPath")
@@ -37,9 +41,11 @@ tar -zxf ohos-sysroot.tar.gz
 rm -rf *.tar.gz
 cd -
 
+# download Node.js source code
+git clone --branch $version --depth 1 https://github.com/nodejs/node.git
+
 # build
-tar -zxf node-${version}.tar.gz
-cd node-${version}
+cd node
 patch -p1 < ../fix_argument_list_too_long.patch
 export CC="/opt/llvm-19/llvm/bin/aarch64-unknown-linux-ohos-clang -Wno-error=implicit-function-declaration"
 export CXX="/opt/llvm-19/llvm/bin/aarch64-unknown-linux-ohos-clang++ -Wno-error=implicit-function-declaration"

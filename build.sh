@@ -46,7 +46,10 @@ git clone --branch $version --depth 1 https://github.com/nodejs/node.git
 
 # build
 cd node
-patch -p1 < ../fix_argument_list_too_long.patch
+need_patch_versions="v24.2.0 v24.3.0 v24.4.0 v24.4.1 v24.5.0 v24.6.0"
+if echo " $need_patch_versions " | grep -q " $version "; then
+    patch -p1 < ../fix_argument_list_too_long.patch
+fi
 export CC="/opt/llvm-19/llvm/bin/aarch64-unknown-linux-ohos-clang -Wno-error=implicit-function-declaration"
 export CXX="/opt/llvm-19/llvm/bin/aarch64-unknown-linux-ohos-clang++ -Wno-error=implicit-function-declaration"
 export CC_host="gcc"
